@@ -3,6 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@aptos-labs/ts-sdk": "^1.12.2",
+    "@aptos-labs/wallet-adapter-react": "^2.3.0",
     "@canvasjs/charts": "^3.8.1",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
@@ -11,6 +13,8 @@
     "@types/node": "^16.18.96",
     "@types/react": "^18.2.78",
     "@types/react-dom": "^18.2.25",
+    "aptos": "^1.21.0",
+    "petra-plugin-wallet-adapter": "^0.4.5",
     "react": "^18.2.0",
     "react-data-table-component": "^7.6.2",
     "react-dom": "^18.2.0",
