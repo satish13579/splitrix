@@ -1,0 +1,18 @@
+.header_wrapper{
+    width: 100;
+    background-color: #000;
+    padding: 20px;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    box-shadow: 0px 0px 10px 1px #fff;
+    z-index: 99;
+}
+
+.profile_name{
+    color: #fff;
+    font-size: 22px;
+}
