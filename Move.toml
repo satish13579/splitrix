@@ -1,9 +1,10 @@
 [package]
 name = "splitrix"
-version = "1.0.0"
+version = "2.0.0"
 authors = []
 
 [addresses]
+creator = "a21eb1a7a80b2fa320ce11f9a8e7e42634558117b3e8f5ac50dac1a08780cb74"
 
 [dev-addresses]
 
