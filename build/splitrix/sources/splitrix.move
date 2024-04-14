@@ -43,7 +43,7 @@ module creator::splitrix{
         resource_address : address
     }
 
-    fun init_module(account: &signer) {
+    public entry fun initialize(account: &signer) {
         if(signer::address_of(account)==@creator){
             if(!exists<AdminResourceAccountInfo>(@creator)){
                 let (_resource, resource_signer_cap) = account::create_resource_account(account, b"SOMESEED");
@@ -73,31 +73,75 @@ module creator::splitrix{
 
     public entry fun create_group(sender:signer,members:vector<address>) acquires Groups,AssignedGroups,AdminResourceAccountInfo {
         let owner = signer::address_of(&sender);
-        let creator_capability = borrow_global<AdminResourceAccountInfo>(@creator);
-        let creator_signer = account::create_signer_with_capability(&creator_capability.resource_signer_cap);
-        if(exists<Groups>(@creator)){
-            let existing_groups = borrow_global_mut<Groups>(@creator);
-            let new_id = vector::length<Group>(&existing_groups.groups)+1;
-            let new_group = Group {
-                owner:owner,
-                is_deleted:false,
-                members: members,
-                bills : vector::empty<Bill>()
-            };
-            vector::push_back<Group>(&mut existing_groups.groups,new_group);
-            if(exists<AssignedGroups>(owner)){
-                let existing_assigned_groups = borrow_global_mut<AssignedGroups>(owner);
-                vector::push_back<u64>(&mut existing_assigned_groups.ids,new_id);
-            }else{
-                let new_assigned_groups = vector::singleton<u64>(new_id);
-                move_to<AssignedGroups>(&sender,AssignedGroups { ids:new_assigned_groups });
-            };
-        } else{
-            let new_Groups = Groups {
-                groups : vector::empty<Group>()
-            };
-            move_to<Groups>(&creator_signer,new_Groups);	
-        };
+        if(exists<AdminResourceAccountInfo>(@creator)){
+            let creator_capability = borrow_global<AdminResourceAccountInfo>(@creator);
+            let creator_signer = account::create_signer_with_capability(&creator_capability.resource_signer_cap);
+                if(exists<Groups>(@creator)){
+                    let existing_groups = borrow_global_mut<Groups>(@creator);
+                    let new_id = vector::length<Group>(&existing_groups.groups)+1;
+                    let new_group = Group {
+                        owner:owner,
+                        is_deleted:false,
+                        members: members,
+                        bills : vector::empty<Bill>()
+                    };
+                    vector::push_back<Group>(&mut existing_groups.groups,new_group);
+                    if(exists<AssignedGroups>(owner)){
+                        let existing_assigned_groups = borrow_global_mut<AssignedGroups>(owner);
+                        vector::push_back<u64>(&mut existing_assigned_groups.ids,new_id);
+                        let eve = LogEvent {
+                            msg:b"Added to existing groups"
+                        };
+                        event::emit(eve);
+                    }else{
+                        let new_assigned_groups = vector::singleton<u64>(new_id);
+                        move_to<AssignedGroups>(&sender,AssignedGroups { ids:new_assigned_groups });
+                        let eve = LogEvent {
+                            msg:b"Created new group"
+                        };
+                        event::emit(eve);
+                    };
+                } else{
+                    let new_group = Group {
+                        owner:owner,
+                        is_deleted:false,
+                        members: members,
+                        bills : vector::empty<Bill>()
+                    };
+                    let new_Groups = Groups {
+                        groups : vector::singleton<Group>(new_group)
+                    };
+                    let eve = LogEvent {
+                            msg:b"Before Move"
+                        };
+                        event::emit(eve);
+                    move_to<Groups>(&creator_signer,new_Groups);
+                    let eve = LogEvent {
+                            msg:b"After Move"
+                        };
+                        event::emit(eve);	
+                    if(exists<AssignedGroups>(owner)){
+                        let existing_assigned_groups = borrow_global_mut<AssignedGroups>(owner);
+                        vector::push_back<u64>(&mut existing_assigned_groups.ids,1);
+                        let eve = LogEvent {
+                            msg:b"Added to existing groups"
+                        };
+                        event::emit(eve);
+                    }else{
+                        let new_assigned_groups = vector::singleton<u64>(1);
+                        move_to<AssignedGroups>(&sender,AssignedGroups { ids:new_assigned_groups });
+                        let eve = LogEvent {
+                            msg:b"Created new group"
+                        };
+                        event::emit(eve);
+                    };
+                };
+        }else{
+            let eve = LogEvent {
+                            msg:b"No Admin Resource Found"
+                        };
+            event::emit(eve);
+        }
     }
 
     #[view]
